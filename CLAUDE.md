@@ -21,7 +21,7 @@ Node **24** (`.nvmrc`; Angular 22 needs `^22.22.3 || ^24.15`). Machine uses nvm-
 
 ## Deployment (GitHub Pages)
 
-The committed `docs/` folder is the deployed site (repo Settings → Pages → branch `main`, folder `/docs`), served at `https://kacperkk2.github.io/sto/`. `npm run build:pages` builds with the `production,pages` configuration (`angular.json`: output straight to `docs/`, `baseHref` `/sto/`) and copies `index.html` to `404.html`, so deep links like `/sto/room/3` work. The build wipes `docs/` first — keep nothing else there (game rules live in the root `GAME_DESIGN.md`). Rebuild and commit `docs/` to redeploy. Prod `apiUrl` (`src/environments/environment.ts`) is still a TODO until the backend has a public HTTPS URL.
+The committed `docs/` folder is the deployed site (repo Settings → Pages → branch `main`, folder `/docs`), served at `https://kacperkk2.github.io/sto/`. `npm run build:pages` builds with the `production,pages` configuration (`angular.json`: output straight to `docs/`, `baseHref` `/sto/`) and copies `index.html` to `404.html`, so deep links like `/sto/room/3` work. The build wipes `docs/` first — keep nothing else there (game rules live in the root `GAME_DESIGN.md`). Rebuild and commit `docs/` to redeploy. Prod `apiUrl` (`src/environments/environment.ts`) points to the backend on Render: `https://sto-backend-tlvf.onrender.com/api`.
 
 ## Structure
 
