@@ -84,6 +84,7 @@ Karty są oparte na eventach, ale nie działają 1:1 jak one. Gracz zagrywa je �
   - ten sam efekt kilka razy na tej samej osobie (kilka takich samych kart albo karta i event) działa jak jeden,
   - różne efekty na tej samej osobie się sumują, np. Va banque + Zobacz zakład + Blitz: obstawia pierwsza, tylko 100/0, w 15 s, a jej zakład widzi podglądający,
   - kilku graczy może podglądać ten sam cel — każdy z nich widzi jego zakład.
+- **Kto obstawia pierwszy, ten nie podgląda:** karta Zobacz zakład gracza, który sam jest celem Zobacz zakład albo liderem eventu Jawny zakład, przepada (jest zużyta, bez efektu). Dzięki temu podglądający zawsze obstawia po swoim celu, np. A↔B albo cykl A→B→C→A — wszystkie te karty przepadają; łańcuch A→B→C — przepada karta B, A widzi zakład B.
 - **Karta bez efektu** (np. Podwójna stawka w rundzie podwójnej) przepada, ale jest zużyta.
 - **Kolejność faz:** karty → (wybór ofiary va banque) → (jawne zakłady, gdy ktoś obstawia jawnie) → zakłady → (decyzja o kopii, gdy ktoś kopiuje) → odkrycie.
 - **Odpowiedzi ukryte przed zakładami:** w fazie kart i przy wyborze ofiary va banque widać tylko pytanie — odpowiedzi pojawiają się dopiero, gdy zaczynają się zakłady.

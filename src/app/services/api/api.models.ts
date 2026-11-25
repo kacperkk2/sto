@@ -6,11 +6,15 @@ export type RoundPhase = 'CARDS' | 'VA_BANQUE_PICK' | 'OPEN_BET' | 'BETTING' | '
 /** Karta gracza — oparta na eventach, ale działa inaczej (opisy w `CONFIG.CARDS`). */
 export type Card = 'VA_BANQUE' | 'DOUBLE' | 'PEEK' | 'COPY' | 'BLITZ' | 'TAX';
 
-/** Karta zagrana w fazie kart; `targetId` — cel (przy kartach „na siebie” sam gracz). */
+/**
+ * Karta zagrana w fazie kart; `targetId` — cel (przy kartach „na siebie” sam gracz);
+ * `voided` — zużyta bez efektu („Zobacz zakład” gracza, który sam obstawia pierwszy).
+ */
 export interface PlayedCard {
   playerId: string;
   card: Card;
   targetId: string;
+  voided: boolean;
 }
 
 /** Podział 100 pkt między odpowiedzi A i B (krok 5). */

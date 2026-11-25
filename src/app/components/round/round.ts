@@ -147,9 +147,29 @@ export class RoundView {
       return 'Obstawiasz jawnie — wszyscy zobaczą Twój zakład.';
     }
     const peekers = r.playedCards
-      .filter((p) => p.card === 'PEEK' && p.targetId === myId)
+      .filter((p) => p.card === 'PEEK' && !p.voided && p.targetId === myId)
       .map((p) => this.store.nick(p.playerId));
     return `Obstawiasz pierwszy — Twój zakład zobaczy: ${peekers.join(', ')}.`;
+  });
+  /**
+   * Dopisek nad panelem zakładu, gdy moja karta „Zobacz zakład” przepadła, bo sam obstawiam pierwszy:
+   * ktoś też chciał zobaczyć mój zakład albo jestem liderem jawnego zakładu.
+   */
+  readonly voidedPeekHint = computed(() => {
+    const myId = this.store.myId();
+    const r = this.round();
+    const mine = r.playedCards.find((p) => p.playerId === myId && p.card === 'PEEK' && p.voided);
+    if (!mine) {
+      return null;
+    }
+    const peekers = r.playedCards.filter((p) => p.card === 'PEEK' && p.targetId === myId).map((p) => p.playerId);
+    if (peekers.includes(mine.targetId)) {
+      return `Ty i ${this.store.nick(mine.targetId)} chcieliście zobaczyć swoje zakłady — obie karty „Zobacz zakład” przepadają.`;
+    }
+    if (peekers.length) {
+      return `${peekers.map((id) => this.store.nick(id)).join(', ')} też chce zobaczyć Twój zakład — Twoja karta „Zobacz zakład” przepada.`;
+    }
+    return 'Obstawiasz jawnie — Twoja karta „Zobacz zakład” przepada.';
   });
   /** Decyzja o kopii: zakłady innych, jeśli je widzę (karta „Zobacz wszystkie” albo „Zobacz zakład”). */
   readonly copyBetOf = (id: string): Bet | null => this.me()?.seenBets?.[id] ?? null;

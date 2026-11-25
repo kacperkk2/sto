@@ -163,6 +163,9 @@
     }
     @case ('OPEN_BET') {
       @if (m?.canBet) {
+        @if (voidedPeekHint(); as hint) {
+          <p class="hint">{{ hint }}</p>
+        }
         <p class="hint">{{ openBetHint() }}</p>
         <app-bet-panel
           [answers]="r.question.answers"
@@ -178,6 +181,9 @@
     }
     @case ('BETTING') {
       @if (showPanel()) {
+        @if (voidedPeekHint(); as hint) {
+          <p class="hint">{{ hint }}</p>
+        }
         <app-bet-panel
           [answers]="r.question.answers"
           [allIn]="m?.mustGoAllIn ?? false"
