@@ -1,6 +1,22 @@
 // Motyw Angular Material (M3) — tokeny dostępne jako zmienne CSS `--mat-sys-*`.
 // https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+// palety M3 wygenerowane z kolorów stołu (`ng generate @angular/material:theme-color`)
+@use './theme-colors' as sto;
+
+// Motyw „Sukno”: zielone sukno stołu, mosiądz jako jedyny akcent, kość słoniowa zamiast bieli,
+// ametyst jako drugi akcent (eventy, `tertiary`), atrament dla kart (`--app-card-*`). Nagłówki i liczby — Fraunces (brand), reszta — Lato.
+$felt: #0f3a2d;
+$felt-light: #175040;
+$felt-deep: #08241c;
+$gold: #c9a55e;
+$gold-soft: #e2c98f;
+$gold-dim: #8c7442;
+$ivory: #efe7d4;
+$sage: #a7b7ac;
+$wine: #8a2a3a;
+$amethyst: #b99ae0;
+$ink: #8fa8e8;
 
 html {
   height: 100%;
@@ -10,19 +26,61 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$orange-palette,
-        tertiary: mat.$magenta-palette,
+        theme-type: dark,
+        primary: sto.$primary-palette,
+        tertiary: sto.$tertiary-palette,
       ),
-      typography: Lato,
+      typography: (
+        plain-family: Lato,
+        brand-family: 'Fraunces',
+      ),
       density: 0,
     )
   );
+  // wygenerowane odcienie są zbyt „miętowe” — powierzchnie i tekst ustawione ręcznie
+  @include mat.theme-overrides(
+    (
+      primary: $gold,
+      on-primary: #1f1708,
+      primary-container: #4a3c1b,
+      on-primary-container: #f1ddb0,
+      tertiary: $amethyst,
+      on-tertiary: #24123a,
+      tertiary-container: #3a2552,
+      on-tertiary-container: #ecdcff,
+      surface: $felt,
+      surface-dim: $felt-deep,
+      surface-bright: #1d5242,
+      surface-container-lowest: #061d16,
+      surface-container-low: #0a2a20,
+      surface-container: #0b2d23,
+      surface-container-high: #123c2f,
+      surface-container-highest: #184737,
+      on-surface: $ivory,
+      on-surface-variant: $sage,
+      outline: $gold-dim,
+      outline-variant: rgba($gold, 0.3),
+      inverse-surface: $ivory,
+      inverse-on-surface: #13261f,
+      inverse-primary: #775a1a,
+    )
+  );
+  // karty (w ręce, zagrane, w opisach) — atrament, osobno od eventów (tertiary)
+  --app-card: #{$ink};
+  --app-on-card: #0d1838;
+  --app-card-container: #1d2a4d;
+  --app-on-card-container: #d8e2ff;
+  // dopiski w trakcie rundy („Musisz postawić wszystko…”)
+  --app-notice: #{$gold-soft};
 }
 
 body {
-  // ciemny motyw jak w spy; `light dark` = zgodnie z ustawieniami systemu
   color-scheme: dark;
   background-color: var(--mat-sys-surface);
+  // sukno: jaśniejsza plama „pod lampą”, ciemniejsze brzegi i drobne ziarno
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .45 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 120% 70% at 50% 20%, $felt-light, $felt 50%, $felt-deep);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
   margin: 0;
@@ -170,4 +228,53 @@ html .mat-mdc-button-base.app-disabled-now:is([disabled], .mat-mdc-button-disabl
   > * {
     flex-shrink: 0;
   }
+}
+
+// Żeton — numer pokoju i miejsce w rankingu. Rozmiar: `--chip-size`, kolory: `.gold` / `.wine`.
+.app-chip {
+  --chip-face: #{$ivory};
+  --chip-edge: #{$wine};
+  --chip-size: 36px;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--chip-size);
+  height: var(--chip-size);
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background:
+    radial-gradient(circle, var(--chip-face) 0 52%, transparent 53%),
+    repeating-conic-gradient(var(--chip-edge) 0 22.5deg, var(--chip-face) 22.5deg 45deg);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.15);
+  color: #1d1a14;
+  font: 700 calc(var(--chip-size) * 0.44) / 1 var(--mat-sys-headline-small-font);
+  font-variant-numeric: lining-nums tabular-nums;
+
+  &.gold {
+    --chip-face: #{$gold};
+    --chip-edge: #{$ivory};
+  }
+
+  &.wine {
+    --chip-face: #{$wine};
+    --chip-edge: #{$ivory};
+    color: $ivory;
+  }
+}
+
+// Uchwyt suwaka jako złoty żeton (zakład, ustawienia hosta).
+html .mat-mdc-slider .mdc-slider__thumb-knob {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background:
+    radial-gradient(circle, #{$gold} 0 50%, transparent 51%),
+    repeating-conic-gradient(#{$ivory} 0 22.5deg, #{$gold} 22.5deg 45deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+html .mat-mdc-slider.mdc-slider--disabled .mdc-slider__thumb-knob {
+  background: var(--mat-sys-on-surface-variant);
 }

@@ -7,6 +7,7 @@ import { CONFIG } from '../../app.properties';
 import { Bet } from '../../services/api/api.models';
 import { RoomStore } from '../../services/room-store/room-store';
 import { BetPanel } from '../bet-panel/bet-panel';
+import { BetRow } from '../bet-row/bet-row';
 import { CardPhase } from '../card-phase/card-phase';
 import { EventInfo } from '../event-info/event-info';
 import { PlayerList } from '../player-list/player-list';
@@ -15,8 +16,6 @@ import { PlayerList } from '../player-list/player-list';
 export interface OpenBet {
   nick: string;
   bet: Bet;
-  /** Podejrzany kartą „Zobacz zakład” — widzę go tylko ja. */
-  secret: boolean;
 }
 
 /**
@@ -25,7 +24,7 @@ export interface OpenBet {
  */
 @Component({
   selector: 'app-round',
-  imports: [MatButtonModule, MatIconModule, MatProgressBarModule, BetPanel, CardPhase, PlayerList],
+  imports: [MatButtonModule, MatIconModule, MatProgressBarModule, BetPanel, BetRow, CardPhase, PlayerList],
   templateUrl: './round.html',
   styleUrl: './round.scss',
 })
@@ -130,20 +129,15 @@ export class RoundView {
   });
   /**
    * Zakłady innych widoczne w fazie zakładów: jawny zakład lidera (event, widzą wszyscy poza nim)
-   * i podejrzane kartą „Zobacz zakład” (`secret` — widzę tylko ja).
+   * i podejrzane kartą „Zobacz zakład” — pokazywane jednakowo, bez względu na źródło.
    */
   readonly openBetsForMe = computed<OpenBet[]>(() => {
     const myId = this.store.myId();
     const open = this.round().openBets;
     const seen = this.round().phase === 'BETTING' ? (this.me()?.seenBets ?? {}) : {};
-    return [
-      ...Object.entries(open)
-        .filter(([id]) => id !== myId)
-        .map(([id, bet]) => ({ nick: this.store.nick(id), bet, secret: false })),
-      ...Object.entries(seen)
-        .filter(([id]) => !(id in open))
-        .map(([id, bet]) => ({ nick: this.store.nick(id), bet, secret: true })),
-    ];
+    return Object.entries({ ...seen, ...open })
+      .filter(([id]) => id !== myId)
+      .map(([id, bet]) => ({ nick: this.store.nick(id), bet }));
   });
   /** Dopisek nad panelem, gdy obstawiam pierwszy: jawnie (event) albo dla podglądających (karta). */
   readonly openBetHint = computed(() => {
@@ -177,20 +171,13 @@ export class RoundView {
       .map((id) => this.store.nick(id))
       .join(', '),
   );
-  /**
-   * Punkty nad odpowiedziami: jawne zakłady albo — w decyzji o kopii — własny zakład kopiującego.
-   * `inline` — podpis w jednym wierszu z liczbami (krótki „Twój zakład”; nicki mogą być długie).
-   */
-  readonly betsAbove = computed<{ label: string; bet: Bet; inline: boolean }[]>(() => {
+  /** Punkty nad odpowiedziami: widoczne zakłady innych albo — w decyzji o kopii — własny zakład kopiującego. */
+  readonly betsAbove = computed<{ label: string; bet: Bet }[]>(() => {
     const m = this.me();
     if (this.round().phase === 'COPY_PICK' && m?.canCopy && m.myBet) {
-      return [{ label: 'Twój zakład', bet: m.myBet, inline: true }];
+      return [{ label: 'Twój zakład', bet: m.myBet }];
     }
-    return this.openBetsForMe().map((o) => ({
-      label: `Zakład gracza ${o.nick}`,
-      bet: o.bet,
-      inline: false,
-    }));
+    return this.openBetsForMe().map((o) => ({ label: o.nick, bet: o.bet }));
   });
   /**
    * Klucz fazy jako osobny `computed` — linkedSignal przelicza się przy każdej zmianie sygnałów

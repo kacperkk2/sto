@@ -36,7 +36,7 @@ li {
 
   mat-icon {
     flex: none;
-    color: var(--mat-sys-primary);
+    color: var(--mat-sys-tertiary);
   }
 
   strong {
@@ -74,9 +74,9 @@ li {
   }
 }
 
-// karty fioletowe (jak kafelki w fazie kart), eventy pomarańczowe
+// ikony eventów w kolorze eventów (ametyst), kart — w kolorze kart (atrament)
 .cards li:not(.off) mat-icon {
-  color: var(--mat-sys-tertiary);
+  color: var(--app-card);
 }
 
 .tag {

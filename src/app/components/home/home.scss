@@ -146,13 +146,9 @@ h1 {
   }
 }
 
+// numer pokoju jako żeton (`.app-chip` w styles.scss), własny pokój — złoty
 .number {
-  flex: none;
-  font: var(--mat-sys-headline-small);
-  font-weight: 700;
-  color: var(--mat-sys-primary);
-  min-width: 1em;
-  text-align: center;
+  --chip-size: 40px;
 }
 
 .info {

@@ -56,19 +56,9 @@
     <!-- odpowiedzi dopiero po decyzjach przed rundą (karty, wybór ofiary va banque) -->
     @if (answersVisible() && (!showPanel() || revealed())) {
       <div class="answers">
-        @for (above of betsAbove(); track $index) {
-          @if (!revealed()) {
-            @if (above.inline) {
-              <div class="bet-row">
-                <span class="open-points">{{ above.bet.onA }}</span>
-                <span class="open-points owner">{{ above.label }}</span>
-                <span class="open-points">{{ above.bet.onB }}</span>
-              </div>
-            } @else {
-              <span class="open-points owner">{{ above.label }}</span>
-              <span class="open-points">{{ above.bet.onA }}</span>
-              <span class="open-points">{{ above.bet.onB }}</span>
-            }
+        @if (!revealed()) {
+          @for (above of betsAbove(); track $index) {
+            <app-bet-row [label]="above.label" [bet]="above.bet" />
           }
         }
         @for (answer of r.question.answers; track $index) {

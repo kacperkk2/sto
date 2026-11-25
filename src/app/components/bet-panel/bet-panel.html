@@ -1,9 +1,5 @@
 @for (ob of openBets(); track $index) {
-  <div class="open-bet">
-    <span class="owner">Zakład gracza {{ ob.nick }}</span>
-    <span>{{ ob.bet.onA }}</span>
-    <span>{{ ob.bet.onB }}</span>
-  </div>
+  <app-bet-row [label]="ob.nick" [bet]="ob.bet" />
 }
 @if (allIn()) {
   <p class="must">Musisz postawić wszystko na jedną odpowiedź.</p>

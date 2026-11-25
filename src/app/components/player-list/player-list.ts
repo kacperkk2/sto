@@ -13,14 +13,11 @@ import { RoomStore } from '../../services/room-store/room-store';
       @for (player of players(); track player.id; let i = $index) {
         <li [class.me]="player.id === store.myId()" [class.winner]="highlightIds().includes(player.id)">
           @if (showScores()) {
-            <span class="place">{{ i + 1 }}.</span>
+            <span class="place app-chip" [class.gold]="i === 0">{{ i + 1 }}</span>
           }
           <span class="nick">{{ player.nick }}</span>
           @if (showHost() && player.isHost) {
             <span class="tag">(host)</span>
-          }
-          @if (player.id === store.myId()) {
-            <span class="you">(ty)</span>
           }
           @if (showCards() && player.cards.length) {
             <span class="cards" role="img" [attr.aria-label]="'Karty: ' + cardNames(player)">
@@ -66,15 +63,14 @@ import { RoomStore } from '../../services/room-store/room-store';
       background: var(--mat-sys-primary-container);
       color: var(--mat-sys-on-primary-container);
     }
+    /* miejsce jako żeton (.app-chip w styles.scss), pierwsze — złote */
     .place {
-      width: 24px;
-      color: var(--mat-sys-on-surface-variant);
+      --chip-size: 26px;
     }
     .nick {
       font: var(--mat-sys-body-large);
     }
-    .tag,
-    .you {
+    .tag {
       color: var(--mat-sys-on-surface-variant);
       font: var(--mat-sys-label-medium);
     }
@@ -114,12 +110,10 @@ import { RoomStore } from '../../services/room-store/room-store';
     .ranked {
       --scale: 1.25;
     }
-    .ranked .place,
     .ranked .nick {
       font-size: calc(var(--mat-sys-body-large-size) * var(--scale));
       line-height: calc(var(--mat-sys-body-large-line-height) * var(--scale));
     }
-    .ranked .you,
     .ranked .gain {
       font-size: calc(var(--mat-sys-label-medium-size) * var(--scale));
       line-height: calc(var(--mat-sys-label-medium-line-height) * var(--scale));
@@ -135,8 +129,12 @@ import { RoomStore } from '../../services/room-store/room-store';
     .compact li {
       padding: 6px 12px;
     }
+    /* nick bez powiększenia — jak w lobby */
+    .ranked.compact .nick {
+      font: var(--mat-sys-body-large);
+    }
     .ranked .place {
-      width: calc(24px * var(--scale));
+      --chip-size: calc(24px * var(--scale));
     }
     .ranked .gain {
       min-width: calc(32px * var(--scale));

@@ -62,7 +62,7 @@ h3 {
     font-size: 20px;
     width: 20px;
     height: 20px;
-    color: var(--mat-sys-tertiary);
+    color: var(--app-card);
   }
 
   .name {
@@ -74,9 +74,9 @@ h3 {
   }
 
   &.selected {
-    border-color: var(--mat-sys-tertiary);
-    background: var(--mat-sys-tertiary-container);
-    color: var(--mat-sys-on-tertiary-container);
+    border-color: var(--app-card);
+    background: var(--app-card-container);
+    color: var(--app-on-card-container);
 
     mat-icon {
       color: inherit;

@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { Bet } from '../../services/api/api.models';
+import { BetRow } from '../bet-row/bet-row';
 
 /**
  * Rozdzielenie 100 pkt między A i B (krok 5). Suwak to punkty na B: lewo = wszystko na A.
@@ -11,7 +12,7 @@ import { Bet } from '../../services/api/api.models';
  */
 @Component({
   selector: 'app-bet-panel',
-  imports: [MatButtonModule, MatIconModule, MatSliderModule],
+  imports: [MatButtonModule, MatIconModule, MatSliderModule, BetRow],
   templateUrl: './bet-panel.html',
   styleUrl: './bet-panel.scss',
 })
@@ -23,8 +24,8 @@ export class BetPanel {
   readonly bet = input<Bet | null>(null);
   /** Czy postawiony zakład można jeszcze zmienić. */
   readonly canChange = input(false);
-  /** Widoczne zakłady innych graczy — ich punkty (z podpisem) nad odpowiedziami; `secret` — widzę tylko ja. */
-  readonly openBets = input<{ nick: string; bet: Bet; secret: boolean }[]>([]);
+  /** Widoczne zakłady innych graczy — ich punkty (z nickiem) nad odpowiedziami. */
+  readonly openBets = input<{ nick: string; bet: Bet }[]>([]);
   readonly placed = output<Bet>();
   /** „Zmień” — rodzic cofa zakład na serwerze, panel odblokuje się, gdy `bet` zniknie. */
   readonly changed = output<void>();

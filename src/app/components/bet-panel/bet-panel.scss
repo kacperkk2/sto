@@ -6,7 +6,7 @@
 
 .must {
   margin: 0;
-  color: var(--mat-sys-error);
+  color: var(--app-notice);
   text-align: center;
 }
 
@@ -14,29 +14,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-}
-
-.open-bet {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: -4px;
-  font: var(--mat-sys-title-medium);
-  color: var(--mat-sys-tertiary);
-
-  span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-  }
-
-  // podpis „Zakład gracza X” nad oboma liczbami
-  .owner {
-    grid-column: 1 / -1;
-    margin-bottom: -4px;
-    font: var(--mat-sys-label-large);
-  }
 }
 
 .answer {
@@ -90,6 +67,7 @@ button.answer.clickable {
 
 .text {
   font: var(--mat-sys-body-large);
+  font-size: 18px;
   text-align: center;
 }
 
@@ -116,7 +94,7 @@ mat-slider {
   }
 
   .text {
-    font: var(--mat-sys-body-medium);
+    font: var(--mat-sys-body-large);
   }
 
   .points {

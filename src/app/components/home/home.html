@@ -51,7 +51,7 @@
           @for (room of rooms; track room.code) {
             <li>
               <button class="room" [disabled]="!canEnter(room)" (click)="join(room)">
-                <span class="number">{{ room.code }}</span>
+                <span class="number app-chip" [class.gold]="isMine(room)">{{ room.code }}</span>
                 <span class="info">
                   <!-- 1. wiersz: host, „twój”, liczba graczy -->
                   <span class="line">
