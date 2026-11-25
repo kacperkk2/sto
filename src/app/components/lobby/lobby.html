@@ -1,0 +1,143 @@
+@if (store.isHost() && store.settingsOpen()) {
+  <section class="settings">
+    @if (store.scenarios(); as scenarios) {
+      <label>Zestaw pytań</label>
+      <mat-chip-listbox class="events" aria-label="Zestaw pytań">
+        @for (s of scenarios; track s.id) {
+          <mat-chip-option
+            [selected]="settings().scenario === s.id"
+            [selectable]="settings().scenario !== s.id"
+            (selectionChange)="$event.isUserInput && $event.selected && update('scenario', s.id)"
+          >
+            {{ s.name }} · {{ s.count }}
+          </mat-chip-option>
+        }
+      </mat-chip-listbox>
+    }
+    @if (scenario(); as selected) {
+      <div class="questions">
+        <label>
+          Zagrane pytania
+          <strong>{{ playedCount() }} / {{ selected.count }}</strong>
+        </label>
+        <button matButton [disabled]="!playedCount()" (click)="store.resetPlayedQuestions(selected.id)">
+          <mat-icon>restart_alt</mat-icon>
+          Resetuj
+        </button>
+      </div>
+      @if (selected.random) {
+        <p class="note">Pytania z Twoich gier nie wracają w kolejnych, dopóki w zestawie są nowe.</p>
+      } @else {
+        <p class="note">Pytania idą po kolei — kolejna gra zaczyna od pierwszego niezagranego.</p>
+      }
+    }
+
+    <mat-divider />
+
+    <label>Liczba rund <strong>{{ settings().rounds }}</strong></label>
+    <mat-slider min="3" max="30" step="1">
+      <input matSliderThumb #rounds [value]="settings().rounds" (input)="update('rounds', rounds.valueAsNumber)" />
+    </mat-slider>
+
+    <mat-divider />
+
+    <label>Czas na zakład <strong>{{ settings().betSeconds }} s</strong></label>
+    <mat-slider min="10" max="120" step="5">
+      <input matSliderThumb #betSeconds [value]="settings().betSeconds" (input)="update('betSeconds', betSeconds.valueAsNumber)" />
+    </mat-slider>
+
+    <mat-divider />
+
+    <label>Szansa na event <strong>{{ settings().eventChance }}%</strong></label>
+    <mat-slider min="0" max="100" step="10">
+      <input matSliderThumb #eventChance [value]="settings().eventChance" (input)="update('eventChance', eventChance.valueAsNumber)" />
+    </mat-slider>
+
+    <div class="events-label">
+      <button type="button" class="app-info-label" aria-label="Eventy w losowaniu — opisy eventów" (click)="showEvents()">
+        Eventy w losowaniu · {{ settings().events.length }}
+        <mat-icon>info</mat-icon>
+      </button>
+    </div>
+    <p class="note">W każdej rundzie z podaną szansą losowany jest jeden z wybranych eventów.</p>
+    <mat-chip-listbox class="events" multiple aria-label="Eventy w losowaniu">
+      @for (event of allEvents; track event) {
+        <mat-chip-option
+          [selected]="settings().events.includes(event)"
+          (selectionChange)="$event.isUserInput && toggleEvent(event, $event.selected)"
+        >
+          <mat-icon matChipAvatar>{{ eventInfo[event].icon }}</mat-icon>
+          {{ eventInfo[event].name }}
+        </mat-chip-option>
+      }
+    </mat-chip-listbox>
+
+    <mat-divider />
+
+    <label>Czas na wybór karty <strong>{{ settings().cardSeconds }} s</strong></label>
+    <mat-slider min="5" max="60" step="5">
+      <input matSliderThumb #cardSeconds [value]="settings().cardSeconds" (input)="update('cardSeconds', cardSeconds.valueAsNumber)" />
+    </mat-slider>
+
+    <div class="events-label">
+      <button type="button" class="app-info-label" aria-label="Karty graczy — opisy kart" (click)="showCards()">
+        Karty graczy · {{ settings().cards.length }}
+        <mat-icon>info</mat-icon>
+      </button>
+    </div>
+    <p class="note">Każdy gracz dostaje na start po jednej sztuce każdej wybranej karty.</p>
+    <mat-chip-listbox class="events" multiple aria-label="Karty graczy">
+      @for (card of allCards; track card) {
+        <mat-chip-option
+          [selected]="settings().cards.includes(card)"
+          (selectionChange)="$event.isUserInput && toggleCard(card, $event.selected)"
+        >
+          <mat-icon matChipAvatar>{{ cardInfo[card].icon }}</mat-icon>
+          {{ cardInfo[card].name }}
+        </mat-chip-option>
+      }
+    </mat-chip-listbox>
+
+    <mat-divider />
+
+    <mat-slide-toggle [checked]="settings().lastRoundDouble" (change)="update('lastRoundDouble', $event.checked)">
+      Mnożnik x2 punktów w ostatniej rundzie
+    </mat-slide-toggle>
+  </section>
+} @else {
+  <section class="players">
+    <h2>Gracze · {{ store.state()?.players?.length }}</h2>
+    <div class="app-scroll">
+      <app-player-list [players]="store.state()?.players ?? []" [showHost]="true" />
+    </div>
+    @if (missingPlayers() > 0) {
+      <p class="hint">Do gry potrzeba co najmniej {{ minPlayers }} graczy</p>
+    }
+  </section>
+  @if (store.state()?.settings; as roomSettings) {
+    <app-settings-summary class="summary" [settings]="roomSettings" [scenarioName]="roomScenarioName()" />
+  }
+}
+
+@if (store.isHost()) {
+  <div class="actions">
+    @if (devBots && !store.settingsOpen()) {
+      <button matButton [disabled]="store.busy()" (click)="store.addBots(10)">
+        <mat-icon>smart_toy</mat-icon>
+        Dodaj 10 botów (dev)
+      </button>
+    }
+    @if (!store.settingsOpen()) {
+      <button matButton="tonal" (click)="store.settingsOpen.set(true)">
+        <mat-icon>tune</mat-icon>
+        Ustawienia gry
+      </button>
+    }
+    <button matButton="filled" [disabled]="missingPlayers() > 0 || store.busy()" (click)="start()">
+      <mat-icon>play_arrow</mat-icon>
+      Rozpocznij grę
+    </button>
+  </div>
+} @else {
+  <p class="hint wait">Czekamy, aż host rozpocznie grę…</p>
+}

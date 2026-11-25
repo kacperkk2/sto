@@ -1,0 +1,83 @@
+:host {
+  display: block;
+}
+
+h2 {
+  font: var(--mat-sys-title-medium);
+  margin: 8px 0;
+}
+
+// etykieta po lewej, wartość po prawej (długa lista eventów zawija się w swojej kolumnie)
+dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 16px;
+  row-gap: 4px;
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+dt {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+dd {
+  margin: 0;
+  text-align: right;
+  color: var(--mat-sys-on-surface);
+}
+
+.events {
+  display: flex;
+  align-items: center;
+}
+
+// ptaszek (tak) / krzyżyk (nie) — ikona tej samej wielkości co ikony eventów
+.flag {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// zawsze 4 ikony w jednej linii — wiersz ma stałą wysokość niezależnie od ustawień
+.event-icons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.event {
+  position: relative;
+  display: inline-flex;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  // wyłączony: wyszarzony i przekreślony ukośnie (kreska w tym samym kolorze)
+  &.off {
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.5;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: -2px;
+      right: -2px;
+      top: 50%;
+      height: 2px;
+      border-radius: 1px;
+      background: currentColor;
+      transform: rotate(-45deg);
+    }
+  }
+}

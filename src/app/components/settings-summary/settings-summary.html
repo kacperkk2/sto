@@ -1,0 +1,66 @@
+<h2>Ustawienia gry</h2>
+<dl>
+  <dt>Zestaw pytań</dt>
+  <dd>{{ scenarioName() ?? settings().scenario ?? '—' }}</dd>
+
+  <dt>Rundy</dt>
+  <dd>{{ settings().rounds }}</dd>
+
+  <dt>Czas na zakład</dt>
+  <dd>{{ settings().betSeconds }} s</dd>
+
+  <dt>Czas na wybór karty</dt>
+  <dd>{{ settings().cardSeconds }} s</dd>
+
+  <dt>Szansa na event</dt>
+  <dd>{{ eventsEnabled() ? settings().eventChance + '%' : '—' }}</dd>
+
+  <dt class="events">
+    <button type="button" class="app-info-label" aria-label="Eventy — opisy eventów" (click)="showEvents()">
+      Eventy
+      <mat-icon>info</mat-icon>
+    </button>
+  </dt>
+  <dd class="event-icons">
+    @for (event of eventIcons(); track event.id) {
+      <span
+        class="event"
+        [class.off]="!event.active"
+        role="img"
+        [attr.aria-label]="event.name + (event.active ? '' : ' — wyłączony')"
+        [title]="event.name"
+      >
+        <mat-icon aria-hidden="true">{{ event.icon }}</mat-icon>
+      </span>
+    }
+  </dd>
+
+  <dt class="events">
+    <button type="button" class="app-info-label" aria-label="Karty — opisy kart" (click)="showCards()">
+      Karty
+      <mat-icon>info</mat-icon>
+    </button>
+  </dt>
+  <dd class="event-icons">
+    @for (card of cardIcons(); track card.id) {
+      <span
+        class="event"
+        [class.off]="!card.active"
+        role="img"
+        [attr.aria-label]="card.name + (card.active ? '' : ' — wyłączona')"
+        [title]="card.name"
+      >
+        <mat-icon aria-hidden="true">{{ card.icon }}</mat-icon>
+      </span>
+    }
+  </dd>
+
+  <dt>Mnożnik x2 w ostatniej rundzie</dt>
+  <dd class="flag">
+    <mat-icon
+      role="img"
+      [attr.aria-label]="settings().lastRoundDouble ? 'tak' : 'nie'"
+      >{{ settings().lastRoundDouble ? 'check' : 'close' }}</mat-icon
+    >
+  </dd>
+</dl>

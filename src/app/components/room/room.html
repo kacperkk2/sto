@@ -1,0 +1,81 @@
+<div class="room">
+  <header class="bar">
+    <div class="side">
+      @if (inSettings()) {
+        <button matIconButton aria-label="Wróć do listy graczy" (click)="store.settingsOpen.set(false)">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      } @else {
+        <a matIconButton routerLink="/" aria-label="Wyjdź">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+      }
+    </div>
+    <h1 class="code">
+      Pokój {{ store.code() }}
+      @if (inSettings()) {
+        <span class="dot">·</span> Ustawienia
+      }
+    </h1>
+    <div class="side end">
+      @if (store.view() === 'room' && store.connection() !== 'open') {
+        <span class="connecting app-delayed app-pulse"><mat-icon>wifi_off</mat-icon> Łączenie…</span>
+      }
+      @if (store.view() === 'room' && store.isHost()) {
+        <button matIconButton [matMenuTriggerFor]="menu" aria-label="Menu hosta">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item [disabled]="store.busy()" (click)="store.closeRoom()">
+            <mat-icon>close</mat-icon>
+            Zamknij pokój
+          </button>
+        </mat-menu>
+      }
+    </div>
+  </header>
+
+  <main>
+    @switch (store.view()) {
+      @case ('loading') {
+        <div class="center"><mat-spinner diameter="48" /></div>
+      }
+      @case ('join') {
+        <div class="center form">
+          <h2>Dołącz do pokoju {{ store.code() }}</h2>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Twój nick</mat-label>
+            <input matInput [(ngModel)]="nick" [maxlength]="nickMaxLength" (keyup.enter)="join()" />
+          </mat-form-field>
+          @if (store.errorMessage()) {
+            <p class="error">{{ store.errorMessage() }}</p>
+          }
+          <button matButton="filled" [disabled]="!nickValid" (click)="join()">Dołącz</button>
+        </div>
+      }
+      @case ('error') {
+        <div class="center">
+          <mat-icon class="big">error</mat-icon>
+          <p>{{ store.errorMessage() }}</p>
+          <div class="actions">
+            <button matButton="tonal" (click)="store.retry()">Spróbuj ponownie</button>
+            <a matButton routerLink="/">Strona główna</a>
+          </div>
+        </div>
+      }
+      @case ('room') {
+        @switch (store.state()?.status) {
+          @case ('LOBBY') {
+            <app-lobby />
+          }
+          @case ('IN_GAME') {
+            <app-round />
+          }
+          @case ('FINISHED') {
+            <app-finished />
+          }
+        }
+      }
+    }
+  </main>
+</div>

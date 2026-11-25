@@ -1,0 +1,236 @@
+// Mała górna sekcja (tytuł + nick), reszta ekranu na listę pokoi.
+// Kafelki są niskie (jeden wiersz), żeby komplet 5 pokoi mieścił się bez przewijania.
+:host {
+  display: block;
+  height: 100%;
+}
+
+.home {
+  height: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  box-sizing: border-box;
+  // awaryjnie (np. bardzo niski ekran w poziomie) — normalnie nic się nie przewija
+  overflow-y: auto;
+}
+
+// powitanie / przycisk „Ustaw swój nick” / pole nicku — stała wysokość, nic nie skacze
+.hello {
+  flex: none;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+h1 {
+  min-width: 0;
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.name {
+  color: var(--mat-sys-primary);
+  font-weight: 700;
+}
+
+.set-nick {
+  flex: 1;
+  height: 48px;
+}
+
+.nick-form {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// dół: „Nowy pokój” pod listą, pod kciukiem
+.create {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  button {
+    height: 48px;
+  }
+}
+
+.divider {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+// lista pokoi zajmuje resztę ekranu (.app-scroll tylko awaryjnie)
+.join {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rooms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+// kafelek: numer | 2 wiersze (host + „twój” + liczba graczy, pozostali gracze)
+.room {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  min-height: 64px;
+  box-sizing: border-box;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-large);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.number {
+  flex: none;
+  font: var(--mat-sys-headline-small);
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+  min-width: 1em;
+  text-align: center;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sub {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// nick hosta — pogrubiony pierwszy wiersz, bez ikony
+.host {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+}
+
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.players {
+  flex: 1;
+  min-width: 0;
+}
+
+// „twój” — zwykły tekst, tylko przy własnym pokoju
+.status {
+  flex: none;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+}
+
+.meta {
+  flex: none;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+}
+
+.hint {
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  margin: 0;
+
+  &.empty {
+    margin-top: 24px;
+  }
+}
+
+.error {
+  color: var(--mat-sys-error);
+  text-align: center;
+  margin: 0;
+}

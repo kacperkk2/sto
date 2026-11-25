@@ -1,0 +1,86 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: -12px;
+}
+
+h2 {
+  font: var(--mat-sys-title-medium);
+  margin: 8px 0;
+}
+
+.cards-title {
+  margin-top: 20px;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+
+  mat-icon {
+    flex: none;
+    color: var(--mat-sys-primary);
+  }
+
+  strong {
+    font: var(--mat-sys-title-small);
+    color: var(--mat-sys-on-surface);
+  }
+
+  p {
+    margin: 2px 0 0;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  // event bieżącej rundy
+  &.current {
+    margin: 0 -12px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--mat-sys-tertiary-container);
+
+    mat-icon,
+    strong,
+    p,
+    .tag {
+      color: var(--mat-sys-on-tertiary-container);
+    }
+  }
+
+  &.off {
+    opacity: 0.5;
+
+    mat-icon {
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+}
+
+// karty fioletowe (jak kafelki w fazie kart), eventy pomarańczowe
+.cards li:not(.off) mat-icon {
+  color: var(--mat-sys-tertiary);
+}
+
+.tag {
+  margin-left: 4px;
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-surface-variant);
+}

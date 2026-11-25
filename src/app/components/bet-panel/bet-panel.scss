@@ -1,0 +1,129 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.must {
+  margin: 0;
+  color: var(--mat-sys-error);
+  text-align: center;
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.open-bet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: -4px;
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-tertiary);
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  // podpis „Zakład gracza X” nad oboma liczbami
+  .owner {
+    grid-column: 1 / -1;
+    margin-bottom: -4px;
+    font: var(--mat-sys-label-large);
+  }
+}
+
+.answer {
+  /* 0 = brak podświetlenia, 1 = pełne (100 pkt). */
+  --level: 0;
+  --pct: calc(var(--level) * 100%);
+  /* 0 = normalnie, 1 = lekko wyszarzony (0 pkt) — nadal czytelny. */
+  --dim: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 2px solid color-mix(in srgb, var(--mat-sys-primary) var(--pct), var(--mat-sys-outline-variant));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--mat-sys-primary-container) var(--pct), var(--mat-sys-surface-container));
+  color: color-mix(in srgb, var(--mat-sys-on-primary-container) var(--pct), var(--mat-sys-on-surface));
+  font: inherit;
+  opacity: calc(1 - var(--dim) * 0.3);
+  transition:
+    border-color 150ms,
+    background-color 150ms,
+    color 150ms,
+    opacity 150ms;
+
+  &.selected {
+    --level: 1;
+  }
+
+  // wyszarzenie z opóźnieniem jak globalnie (styles.scss), powrót natychmiastowy
+  &:disabled,
+  &.disabled {
+    opacity: 0.6;
+    transition:
+      border-color 150ms,
+      background-color 150ms,
+      color 150ms,
+      opacity 200ms ease-out 400ms;
+  }
+}
+
+button.answer {
+  cursor: default;
+}
+
+button.answer:enabled:not([aria-disabled='true']),
+button.answer.clickable {
+  cursor: pointer;
+}
+
+.text {
+  font: var(--mat-sys-body-large);
+  text-align: center;
+}
+
+.points {
+  font: var(--mat-sys-headline-medium);
+}
+
+// mat-slider ma domyślnie margin 0 8px — z width: 100% wystawał poza ekran
+// (stąd poziomy suwak); blok z width: auto wypełnia szerokość razem z marginesem
+mat-slider {
+  display: block;
+  width: auto;
+}
+
+.place {
+  margin-top: 4px;
+}
+
+// niskie ekrany — panel musi zmieścić się pod pytaniem
+@media (max-height: 680px) {
+  .answer {
+    padding: 8px;
+    gap: 0;
+  }
+
+  .text {
+    font: var(--mat-sys-body-medium);
+  }
+
+  .points {
+    font: var(--mat-sys-headline-small);
+  }
+
+  .place {
+    margin-top: 0;
+  }
+}

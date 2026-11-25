@@ -1,0 +1,45 @@
+<header>
+  <h2>{{ data.cardsOnly ? 'Karty' : 'Eventy' }}</h2>
+  <button matIconButton aria-label="Zamknij" (click)="sheetRef.dismiss()">
+    <mat-icon>close</mat-icon>
+  </button>
+</header>
+@if (!data.cardsOnly) {
+  <ul>
+    @for (event of events; track event.id) {
+      @let active = data.active.includes(event.id);
+      <li [class.off]="!active" [class.current]="event.id === data.current">
+        <mat-icon>{{ event.icon }}</mat-icon>
+        <div>
+          <strong>
+            {{ event.name }}
+            @if (event.id === data.current) {
+              <span class="tag">w tej rundzie</span>
+            }
+          </strong>
+          <p>{{ event.description }}</p>
+        </div>
+      </li>
+    }
+  </ul>
+}
+@if (cards.length) {
+  @if (!data.cardsOnly) {
+    <h2 class="cards-title">Karty</h2>
+  }
+  <ul class="cards">
+    @for (card of cards; track card.id) {
+      @let off = !!data.available && !data.available.includes(card.id);
+      <li [class.off]="off">
+        <mat-icon>{{ card.icon }}</mat-icon>
+        <div>
+          <strong>
+            {{ card.name }}
+            <span class="tag">{{ card.target === 'other' ? 'na innego gracza' : 'na siebie' }}</span>
+          </strong>
+          <p>{{ card.description }}</p>
+        </div>
+      </li>
+    }
+  </ul>
+}

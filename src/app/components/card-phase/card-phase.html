@@ -1,0 +1,66 @@
+@let m = me();
+
+@if (m?.canPlayCard) {
+  <section class="pick">
+    <h3 class="title">
+      Zagrasz kartę?
+      <button matIconButton class="info" aria-label="Opisy kart" (click)="showCards()">
+        <mat-icon>info</mat-icon>
+      </button>
+    </h3>
+    <div class="cards">
+      @for (c of hand(); track c.id) {
+        <button
+          type="button"
+          class="card"
+          [class.selected]="card() === c.id"
+          [attr.aria-pressed]="card() === c.id"
+          [disabled]="store.busy()"
+          (click)="selectCard(c.id)"
+        >
+          <mat-icon>{{ c.icon }}</mat-icon>
+          <span class="name">{{ c.name }}</span>
+        </button>
+      }
+    </div>
+
+    @if (needsTarget()) {
+      <h3>Na kogo?</h3>
+      <div class="choices">
+        @for (p of others(); track p.id) {
+          <button
+            type="button"
+            class="choice"
+            [class.selected]="target() === p.id"
+            [attr.aria-pressed]="target() === p.id"
+            [disabled]="store.busy()"
+            (click)="selectTarget(p.id)"
+          >
+            {{ p.nick }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="buttons">
+      <button matButton="filled" [disabled]="store.busy() || !canPlay()" (click)="play()">
+        <mat-icon>style</mat-icon>
+        {{ playLabel() }}
+      </button>
+      <button matButton="outlined" [disabled]="store.busy()" (click)="store.passCard()">
+        <mat-icon>block</mat-icon>
+        Pas
+      </button>
+    </div>
+  </section>
+} @else if (m?.cardDecided) {
+  <p class="decided">
+    @if (myChoice(); as choice) {
+      <mat-icon>{{ choice.icon }}</mat-icon>
+      Zagrywasz: <strong>{{ choice.text }}</strong>
+    } @else {
+      <mat-icon>block</mat-icon>
+      Pasujesz w tej rundzie
+    }
+  </p>
+}

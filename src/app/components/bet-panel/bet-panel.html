@@ -1,0 +1,72 @@
+@for (ob of openBets(); track $index) {
+  <div class="open-bet">
+    <span class="owner">Zakład gracza {{ ob.nick }}</span>
+    <span>{{ ob.bet.onA }}</span>
+    <span>{{ ob.bet.onB }}</span>
+  </div>
+}
+@if (allIn()) {
+  <p class="must">Musisz postawić wszystko na jedną odpowiedź.</p>
+  <div class="answers">
+    @for (answer of answers(); track $index) {
+      <button
+        class="answer"
+        [class.selected]="allInChoice() === $index"
+        [disabled]="disabled() || locked()"
+        (click)="allInChoice.set($index === 0 ? 0 : 1)"
+      >
+        <span class="text">{{ answer }}</span>
+        <span class="points">{{ allInChoice() === $index ? 100 : 0 }}</span>
+      </button>
+    }
+  </div>
+} @else {
+  <div class="answers">
+    <!-- kliknięcie kafelka = suwak w całości na tę odpowiedź; bez natywnego disabled,
+         żeby zablokowany (postawiony) zakład nie wyszarzał kafelków -->
+    <button
+      class="answer"
+      [style.--level]="level(onA())"
+      [style.--dim]="dim(onA())"
+      [class.disabled]="disabled()"
+      [class.clickable]="!disabled() && !locked()"
+      [attr.aria-disabled]="disabled() || locked()"
+      (click)="pick(0)"
+    >
+      <span class="text">{{ answers()[0] }}</span>
+      <span class="points">{{ onA() }}</span>
+    </button>
+    <button
+      class="answer"
+      [style.--level]="level(onB())"
+      [style.--dim]="dim(onB())"
+      [class.disabled]="disabled()"
+      [class.clickable]="!disabled() && !locked()"
+      [attr.aria-disabled]="disabled() || locked()"
+      (click)="pick(100)"
+    >
+      <span class="text">{{ answers()[1] }}</span>
+      <span class="points">{{ onB() }}</span>
+    </button>
+  </div>
+  <mat-slider min="0" max="100" step="5" [disabled]="disabled() || locked()">
+    <input
+      matSliderThumb
+      #thumb
+      [value]="onB()"
+      (input)="set(thumb.valueAsNumber)"
+      [attr.aria-label]="'Punkty na: ' + answers()[1]"
+    />
+  </mat-slider>
+}
+@if (!locked()) {
+  <button matButton="filled" class="place" [disabled]="!canPlace()" (click)="place()">
+    <mat-icon>check</mat-icon>
+    Postaw
+  </button>
+} @else if (canChange()) {
+  <button matButton="outlined" class="place" [disabled]="disabled()" (click)="changed.emit()">
+    <mat-icon>edit</mat-icon>
+    Zmień
+  </button>
+}

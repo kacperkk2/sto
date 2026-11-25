@@ -1,0 +1,173 @@
+// Motyw Angular Material (M3) — tokeny dostępne jako zmienne CSS `--mat-sys-*`.
+// https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  // strona nigdy się nie przewija — każdy widok mieści się w ekranie,
+  // a przewija się co najwyżej jego sekcja z listą (`.app-scroll`)
+  overflow: hidden;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$orange-palette,
+        tertiary: mat.$magenta-palette,
+      ),
+      typography: Lato,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // ciemny motyw jak w spy; `light dark` = zgodnie z ustawieniami systemu
+  color-scheme: dark;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+  // na telefonach: wysokość widocznej części ekranu (bez paska adresu)
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// app-root i hosty tras (app-home, app-room) wypełniają cały ekran
+app-root {
+  display: block;
+  height: 100%;
+}
+
+// Wskaźniki ładowania/łączenia pojawiają się dopiero, gdy czekanie trwa
+// zauważalnie długo — przy szybkiej odpowiedzi znikają z DOM, zanim staną się
+// widoczne (bez migania), a potem łagodnie się pokazują.
+// Każdy spinner Materiala dostaje to automatycznie; inne elementy — klasą
+// `.app-delayed` (opóźnienie zmienia `--app-delay`, pulsowanie — `.app-pulse`).
+.mat-mdc-progress-spinner,
+.app-delayed {
+  opacity: 0;
+  animation: app-delayed-in 300ms ease-out var(--app-delay, 600ms) forwards;
+}
+
+.app-delayed.app-pulse {
+  animation:
+    app-delayed-in 400ms ease-out var(--app-delay, 600ms) forwards,
+    app-pulse 2s ease-in-out calc(var(--app-delay, 600ms) + 400ms) infinite;
+}
+
+@keyframes app-delayed-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes app-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mat-mdc-progress-spinner,
+  .app-delayed,
+  .app-delayed.app-pulse {
+    animation: app-delayed-in 1ms linear var(--app-delay, 600ms) forwards;
+  }
+}
+
+// To samo dla blokowanych kontrolek: blokada kliknięć działa od razu (ochrona
+// przed podwójną akcją), ale wyszarzenie przychodzi dopiero po 0,4 s — przy
+// szybkiej odpowiedzi serwera kontrolka wraca do normy, zanim zdąży zszarzeć.
+// Przejście jest tylko w stronę „wyłączony”; powrót jest natychmiastowy.
+// Przy pierwszym wyświetleniu przejścia nie działają, więc kontrolki wyłączone
+// od początku (np. za mało graczy) od razu wyglądają na wyłączone.
+// `html` podbija specyficzność ponad style komponentów Materiala.
+$app-disabled-delay: 400ms;
+$app-disabled-fade: 200ms ease-out $app-disabled-delay;
+
+html .mat-mdc-button-base:is([disabled], .mat-mdc-button-disabled) {
+  transition:
+    box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1),
+    background-color $app-disabled-fade,
+    color $app-disabled-fade,
+    border-color $app-disabled-fade;
+}
+
+html .mat-mdc-slider.mdc-slider--disabled {
+  transition: opacity $app-disabled-fade;
+
+  :is(.mdc-slider__track--active_fill, .mdc-slider__track--inactive, .mdc-slider__thumb-knob) {
+    transition:
+      opacity $app-disabled-fade,
+      background-color $app-disabled-fade,
+      border-color $app-disabled-fade;
+  }
+}
+
+// Blokada znana od razu (np. „masz już swój pokój”), a nie czekanie na serwer —
+// wyszarzenie bez opóźnienia.
+html .mat-mdc-button-base.app-disabled-now:is([disabled], .mat-mdc-button-disabled) {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html .mat-mdc-button-base:is([disabled], .mat-mdc-button-disabled),
+  html .mat-mdc-slider.mdc-slider--disabled,
+  html .mat-mdc-slider.mdc-slider--disabled * {
+    transition-duration: 1ms;
+  }
+}
+
+// Etykieta z ikoną ⓘ jako jeden przycisk — klika się cały napis, nie tylko mała ikona.
+// Ujemny margines = padding, więc wygląda jak zwykły tekst w linii.
+.app-info-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: -6px -8px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+  }
+
+  &:active {
+    background: color-mix(in srgb, var(--mat-sys-on-surface) 12%, transparent);
+  }
+}
+
+// Sekcja widoku, która zajmuje pozostałe miejsce i przewija się sama,
+// gdy treść (lista pokoi / graczy / wyniki) się nie mieści.
+.app-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+
+  > * {
+    flex-shrink: 0;
+  }
+}

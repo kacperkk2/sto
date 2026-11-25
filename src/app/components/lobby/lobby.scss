@@ -1,0 +1,116 @@
+// gracze (przewijani) albo ustawienia (host) | przyciski — całość w wysokości ekranu
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+h2 {
+  font: var(--mat-sys-title-medium);
+  margin: 8px 0;
+}
+
+.players {
+  flex: 1 1 0;
+  // nawet na niskim ekranie widać kilku graczy
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    flex: none;
+  }
+
+  // lista tylko tak wysoka jak jej zawartość — komunikat zaraz pod nią,
+  // a przy wielu graczach i tak się kurczy i przewija
+  .app-scroll {
+    flex: 0 1 auto;
+  }
+
+  .hint {
+    flex: none;
+    margin: 8px 0 0;
+    text-align: center;
+  }
+}
+
+// bez overflow — elementy mat-slider wystają poza jego obszar,
+// w przewijanym kontenerze dałyby poziomy suwak
+.settings {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  label {
+    display: flex;
+    justify-content: space-between;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+
+    strong {
+      color: var(--mat-sys-on-surface);
+    }
+  }
+
+  // mat-slider ma domyślnie margin 0 8px — z width: 100% wystawał poza ekran
+  // (stąd poziomy suwak); blok z width: auto wypełnia szerokość razem z marginesem
+  mat-slider {
+    display: block;
+    width: auto;
+    margin-bottom: 4px;
+  }
+
+  .events {
+    margin: 8px 0 4px;
+  }
+
+  .note {
+    margin: 2px 0 0;
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  // oddziela grupy ustawień: rundy | eventy | czas | mnożnik
+  mat-divider {
+    margin: 8px 0 12px;
+  }
+
+  // licznik zagranych pytań z przyciskiem resetu w jednej linii
+  .questions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    label {
+      flex: 1;
+    }
+  }
+
+  // jak etykiety suwaków, ale cały napis z ⓘ jest przyciskiem (.app-info-label)
+  .events-label {
+    display: flex;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.summary {
+  flex: none;
+}
+
+.hint {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.wait {
+  flex: none;
+  text-align: center;
+  margin: 8px 0;
+}
+
+.actions {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

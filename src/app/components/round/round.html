@@ -1,0 +1,233 @@
+@let r = round();
+@let m = me();
+
+<!-- Góra (stała): numer rundy i timer -->
+<header class="head">
+  <div class="top">
+    <span class="round-no">
+      @if (r.tiebreak) {
+        {{ revealed() ? 'Koniec dogrywki' : 'Dogrywka' }}
+      } @else {
+        {{ revealed() ? 'Koniec rundy' : 'Runda' }} {{ r.number }} / {{ r.totalRounds }}
+      }
+    </span>
+    @if (store.secondsLeft() !== null) {
+      <span class="timer" [class.urgent]="store.secondsLeft()! <= 5">
+        <mat-icon>timer</mat-icon>{{ store.secondsLeft() }} s
+      </span>
+    }
+  </div>
+  @if (store.secondsLeft() !== null) {
+    <mat-progress-bar mode="determinate" [value]="timerPercent()" />
+  }
+</header>
+
+<!-- Środek (przewijany, gdy się nie mieści): event, pytanie, wybory, wyniki -->
+<div class="content app-scroll">
+  <!-- event tylko w trakcie rundy — w podsumowaniu go nie pokazujemy -->
+  @if (!revealed() && event(); as e) {
+    <button type="button" class="event" [class.mine]="eventStatus()?.mine" (click)="openEventInfo()">
+      <mat-icon>{{ e.icon }}</mat-icon>
+      <span class="label">
+        <strong>{{ e.name }}</strong>
+        @if (eventStatus(); as status) {
+          · {{ status.text }}
+        }
+      </span>
+      <mat-icon class="info">info</mat-icon>
+    </button>
+  }
+
+  <!-- zagrane karty (jawne po fazie kart) -->
+  @if (!revealed() && playedCards().length) {
+    <ul class="played">
+      @for (c of playedCards(); track c.key) {
+        <li [class.mine]="c.mine" [attr.aria-label]="c.name + ': ' + c.text">
+          <mat-icon aria-hidden="true">{{ c.icon }}</mat-icon>
+          <span>{{ c.text }}</span>
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="question">
+    <span class="category">{{ r.question.category }}</span>
+    <p class="text">{{ r.question.text }}</p>
+    <!-- odpowiedzi dopiero po decyzjach przed rundą (karty, wybór ofiary va banque) -->
+    @if (answersVisible() && (!showPanel() || revealed())) {
+      <div class="answers">
+        @for (above of betsAbove(); track $index) {
+          @if (!revealed()) {
+            @if (above.inline) {
+              <div class="bet-row">
+                <span class="open-points">{{ above.bet.onA }}</span>
+                <span class="open-points owner">{{ above.label }}</span>
+                <span class="open-points">{{ above.bet.onB }}</span>
+              </div>
+            } @else {
+              <span class="open-points owner">{{ above.label }}</span>
+              <span class="open-points">{{ above.bet.onA }}</span>
+              <span class="open-points">{{ above.bet.onB }}</span>
+            }
+          }
+        }
+        @for (answer of r.question.answers; track $index) {
+          <div
+            class="answer"
+            [class.correct]="revealed() && r.result?.correct === $index"
+            [class.wrong]="revealed() && r.result?.correct !== $index"
+          >
+            {{ answer }}
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @switch (r.phase) {
+    @case ('CARDS') {
+      <app-card-phase />
+    }
+    @case ('VA_BANQUE_PICK') {
+      @if (m?.canPickTarget) {
+        <section class="pick">
+          <h3>Kto gra va banque?</h3>
+          <div class="choices">
+            @for (p of others(); track p.id) {
+              <button
+                type="button"
+                class="choice"
+                [class.selected]="vaBanqueChoice() === p.id"
+                [attr.aria-pressed]="vaBanqueChoice() === p.id"
+                [disabled]="store.busy()"
+                (click)="toggleVaBanqueChoice(p.id)"
+              >
+                {{ p.nick }}
+              </button>
+            }
+          </div>
+        </section>
+      }
+    }
+    @case ('COPY_PICK') {
+      @if (m?.canCopy) {
+        <section class="pick">
+          <h3>Chcesz kogoś skopiować?</h3>
+          <!-- z kartą „Zobacz wszystkie”: wiersze na całą szerokość, punkty po bokach (nad swoimi odpowiedziami), nick na środku -->
+          <div class="choices" [class.with-bets]="seesCopyBets()">
+            @for (p of others(); track p.id) {
+              @let bet = copyBetOf(p.id);
+              <button
+                type="button"
+                class="choice"
+                [class.selected]="copyChoice() === p.id"
+                [attr.aria-pressed]="copyChoice() === p.id"
+                [attr.aria-label]="bet ? p.nick + ': ' + bet.onA + ' na A, ' + bet.onB + ' na B' : p.nick"
+                [disabled]="store.busy()"
+                (click)="toggleCopyChoice(p.id)"
+              >
+                @if (seesCopyBets()) {
+                  <span class="choice-bet">{{ bet?.onA ?? '' }}</span>
+                  <span class="choice-nick">{{ p.nick }}</span>
+                  <span class="choice-bet">{{ bet?.onB ?? '' }}</span>
+                } @else {
+                  {{ p.nick }}
+                }
+              </button>
+            }
+          </div>
+        </section>
+      }
+    }
+    @case ('REVEALED') {
+      <app-player-list [players]="store.ranked()" [showScores]="true" [gains]="gains()" [showCards]="true" />
+      <!-- opisy moich kart do przeczytania bez presji czasu -->
+      @if (gameCards().length) {
+        <button matButton class="card-info" (click)="openCardInfo()">
+          <mat-icon>info</mat-icon>
+          Informacje o kartach
+        </button>
+      }
+    }
+  }
+</div>
+
+<!-- Dół (stały): panel zakładu / przycisk akcji / status -->
+<footer class="actions">
+  @switch (r.phase) {
+    @case ('CARDS') {
+      @if (!m?.canPlayCard) {
+        <p class="waiting">Czekamy na wybór kart…</p>
+      }
+      <p class="progress">Zdecydowało {{ r.cardDoneIds.length }} / {{ r.cardPlayerIds.length }}</p>
+    }
+    @case ('VA_BANQUE_PICK') {
+      @if (m?.canPickTarget) {
+        <button matButton="filled" [disabled]="store.busy() || !vaBanqueChoice()" (click)="confirmVaBanque()">
+          <mat-icon>casino</mat-icon>
+          {{ vaBanqueChoice() ? store.nick(vaBanqueChoice()) + ' gra va banque' : 'Wybierz gracza wyżej' }}
+        </button>
+      } @else {
+        <p class="waiting">Czekamy na wybór {{ store.nick(r.vaBanqueChooserId) }}…</p>
+      }
+    }
+    @case ('OPEN_BET') {
+      @if (m?.canBet) {
+        <p class="hint">{{ openBetHint() }}</p>
+        <app-bet-panel
+          [answers]="r.question.answers"
+          [allIn]="m?.mustGoAllIn ?? false"
+          [disabled]="store.busy()"
+          (placed)="place($event)"
+        />
+      } @else if (openBettorsWaiting()) {
+        <p class="waiting">Obstawia jawnie: {{ openBettorsWaiting() }}…</p>
+      } @else {
+        <p class="waiting">Czekamy na pozostałe jawne zakłady…</p>
+      }
+    }
+    @case ('BETTING') {
+      @if (showPanel()) {
+        <app-bet-panel
+          [answers]="r.question.answers"
+          [allIn]="m?.mustGoAllIn ?? false"
+          [bet]="m?.myBet ?? null"
+          [canChange]="m?.canChangeBet ?? false"
+          [openBets]="openBetsForMe()"
+          [disabled]="store.busy()"
+          (placed)="place($event)"
+          (changed)="store.withdrawBet()"
+        />
+      } @else {
+        <p class="waiting">Nie grasz w tej rundzie — kibicujesz.</p>
+      }
+      <p class="progress">Obstawiło {{ r.betPlayerIds.length }} / {{ r.participantIds.length }}</p>
+    }
+    @case ('COPY_PICK') {
+      @if (m?.canCopy) {
+        <button matButton="filled" [disabled]="store.busy() || !copyChoice()" (click)="confirmCopy()">
+          <mat-icon>content_copy</mat-icon>
+          {{ copyChoice() ? 'Przejmij zakład ' + store.nick(copyChoice()) : 'Wybierz gracza wyżej' }}
+        </button>
+        <button matButton="outlined" [disabled]="store.busy()" (click)="store.keepBet()">
+          <mat-icon>check</mat-icon>
+          Zostaję przy swoim
+        </button>
+      } @else if (copyActorsWaiting()) {
+        <p class="waiting">O przejęciu zakładu decyduje: {{ copyActorsWaiting() }}…</p>
+      } @else {
+        <p class="waiting">Czekamy na pozostałe decyzje o kopii…</p>
+      }
+    }
+    @case ('REVEALED') {
+      @if (store.isHost()) {
+        <button matButton="filled" [disabled]="store.busy()" (click)="store.nextRound()">
+          {{ lastRegular() || r.tiebreak ? 'Dalej' : 'Następna runda' }}
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      } @else {
+        <p class="waiting">Czekamy, aż host przejdzie dalej…</p>
+      }
+    }
+  }
+</footer>

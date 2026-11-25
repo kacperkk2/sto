@@ -1,0 +1,105 @@
+<main class="home">
+  <!-- Góra: powitanie / ustawienie nicku -->
+  <header class="hello">
+    @if (editing()) {
+      <div class="nick-form" #nickForm>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Twój nick</mat-label>
+          <input
+            #nickInput
+            matInput
+            [(ngModel)]="draft"
+            [maxlength]="nickMaxLength"
+            autocomplete="nickname"
+            (keyup.enter)="saveNick()"
+            (keyup.escape)="cancelEdit()"
+          />
+        </mat-form-field>
+        <button matIconButton aria-label="Zapisz nick" [disabled]="!draftValid" (click)="saveNick()">
+          <mat-icon>check</mat-icon>
+        </button>
+        @if (nick()) {
+          <button matIconButton aria-label="Anuluj" (click)="cancelEdit()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+    } @else if (nick()) {
+      <h1>
+        Cześć, <span class="name">{{ nick() }}</span>!
+      </h1>
+      <button matIconButton aria-label="Zmień nick" (click)="editNick()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    } @else {
+      <button matButton="tonal" class="set-nick" (click)="editNick()">
+        <mat-icon>person</mat-icon>
+        Ustaw swój nick
+      </button>
+    }
+  </header>
+
+  <div class="divider">
+    <span>Pokoje @if (rooms(); as rooms) { {{ rooms.length }}/{{ maxRooms }} }</span>
+  </div>
+
+  <!-- Środek: lista pokoi (max 5 — mieści się bez przewijania) -->
+  <section class="join app-scroll">
+    @if (rooms(); as rooms) {
+      @if (rooms.length) {
+        <ul class="rooms">
+          @for (room of rooms; track room.code) {
+            <li>
+              <button class="room" [disabled]="!canEnter(room)" (click)="join(room)">
+                <span class="number">{{ room.code }}</span>
+                <span class="info">
+                  <!-- 1. wiersz: host, „twój”, liczba graczy -->
+                  <span class="line">
+                    <span class="host ellipsis">{{ room.hostNick }}</span>
+                    @if (isMine(room)) {
+                      <span class="status">twój</span>
+                    }
+                    <span class="meta"><mat-icon>group</mat-icon>{{ room.playerCount }}</span>
+                  </span>
+                  <!-- 2. wiersz: pozostali gracze -->
+                  <span class="line sub">
+                    <span class="ellipsis players">{{ otherPlayers(room) || 'Czeka na graczy…' }}</span>
+                  </span>
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="hint empty">Nie ma jeszcze żadnego pokoju — załóż pierwszy.</p>
+      }
+    } @else if (!roomsError()) {
+      <div class="loading"><mat-spinner diameter="32" /></div>
+    }
+
+    @if (roomsError()) {
+      <p class="error">{{ roomsError() }}</p>
+    }
+  </section>
+
+  <!-- Dół: nowy pokój -->
+  <footer class="create">
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    @if (createHint(); as hint) {
+      <p class="hint">{{ hint }}</p>
+    }
+    <!-- disabledInteractive: wygląda na wyłączony, ale kliknięcie pokazuje komunikat (limit / własny pokój);
+         app-disabled-now: wtedy wyszarzenie od razu — opóźnienie z styles.scss jest tylko dla busy -->
+    <button
+      matButton="filled"
+      [disabled]="busy() || full() || hasOwnRoom()"
+      [class.app-disabled-now]="full() || hasOwnRoom()"
+      disabledInteractive
+      (click)="create()"
+    >
+      Stwórz pokój
+    </button>
+  </footer>
+</main>
